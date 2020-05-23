@@ -8,12 +8,9 @@ import { connect } from "react-redux";
 import * as actionypes from '../../store/actions/index'
 
 class Orders extends Component {
-    state ={
-        order: [],
-        loading: true
-    }
+
     componentDidMount(){
-        this.props.onFetchOrder()
+        this.props.onFetchOrder(this.props.token, this.props.userId)
     }
      
     render() {
@@ -39,13 +36,15 @@ class Orders extends Component {
 const mapStateToProps = state => {
     return {
         orders: state.order.orders,
-        loading: state.order.loading
+        loading: state.order.loading,
+        token: state.auth.token,
+        userId: state.auth.userId
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        onFetchOrder: () => dispatch(actionypes.fetchOrders())
+        onFetchOrder: (token, userId) => dispatch(actionypes.fetchOrders(token, userId))
     }
 }
 

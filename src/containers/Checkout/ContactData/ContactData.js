@@ -9,6 +9,7 @@ import withErrorHandler from '../../../hoc/withErrorHandler'
 
 import * as actionTypes from '../../../store/actions/index'
 import { connect } from "react-redux";
+import { updateObject, checkValidity } from '../../../shared/utility';
 
 class ContactData extends Component {
     state = {
@@ -95,29 +96,22 @@ class ContactData extends Component {
         formValid: false,
     }
 
-    checkValidity = (value, rules) => {
-        let isValid = true
-        if(!rules)
-            return true
-        if(rules.required){
-            isValid = value.trim() !== '' && isValid
-        }
-        if(rules.minLength){
-            isValid = value.length >= rules.minLength && isValid
-        }
-
-        return isValid
-    }
-
     inputChangeHandler = (event, inputIdentifier) => {
-        const formData = {
-             ...this.state.order
-        }
-        const formElement = {...formData[inputIdentifier]}
-        formElement.value = event.target.value
-        formElement.touch = true
-        formElement.valid = this.checkValidity(formElement.value, formElement.validation)
-        formData[inputIdentifier] = formElement
+        //const formElement = {...formData[inputIdentifier]}
+        const formElement = updateObject(this.state.order[inputIdentifier], {
+            value: event.target.value,
+            touch: true,
+            valid: checkValidity(event.target.value, this.state.order[inputIdentifier].validation)
+        })
+        // {
+        //         ...this.state.order
+        // }
+        // formElement.value = event.target.value
+        // formElement.touch = true
+        // formElement.valid = this.checkValidity(formElement.value, formElement.validation)
+        const formData = updateObject(this.state.order,{
+            [inputIdentifier]: formElement
+        })
 
         let formisValid = true
         for (let inputIdentifier in formData){
@@ -137,10 +131,11 @@ class ContactData extends Component {
         const order = {
             ingredients: this.props.ings,
             price: this.props.totalPrice,
-            orderData: formData
+            orderData: formData,
+            userId: this.props.userId
         }
         console.log(order);
-        this.props.onOrderBurger(order)
+        this.props.onOrderBurger(order, this.props.token)
     }
 
     render() {
@@ -183,13 +178,15 @@ const mapStateToProps = state => {
     return {
         ings: state.burgerBuilder.ingredients,
         totalPrice: state.burgerBuilder.totalPrice,
-        loading: state.order.loading
+        loading: state.order.loading,
+        token: state.auth.token,
+        userId: state.auth.userId
     }
 }
 
 const mapDispatchToProps = dispatch =>  {
     return {
-        onOrderBurger: (orderData) => dispatch(actionTypes.purchaseBurger(orderData))
+        onOrderBurger: (orderData, token) => dispatch(actionTypes.purchaseBurger(orderData, token))
     }
 }
 

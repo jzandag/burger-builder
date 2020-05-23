@@ -4,15 +4,9 @@ import classes from './Order.module.css'
 
 const Order = (props) => {
     let ingredients = Object.keys(props.ingredients).map((ing,index) => {
-        return <span key={index} style={{
-                textTransform: 'capitalize',
-                border: '2px solid orange',
-                padding: '5px',
-                borderRadius: '5px',
-                color: 'orange',
-                backgroudColor: 'white',
-                margin: '10px'
-                }}>{ing}: {props.ingredients[ing]} </span>
+        return <div key={index} 
+                    className={classes.Span}
+                >{ing}: {props.ingredients[ing]} </div>
     })
 
     //ALTERNATIVE
